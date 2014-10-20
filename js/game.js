@@ -278,7 +278,7 @@ var render = function (deltaTime)
 	        		//ball.giveDirection(ball.spawnX, ball.spawnY, false)
 	        		ball.turn()
 	        		
-	        		console.trace(now-ComboThen, now, ComboThen)
+	        		//console.trace(now-ComboThen, now, ComboThen)
 					if (survivedSeconds-ComboThen <= 1)
 	        		{
 	        			comboThen = now
@@ -602,7 +602,7 @@ function Pad()
       	ctx.lineWidth = 10
 
       	// line color
-      	ctx.strokeStyle = 'green';
+      	ctx.strokeStyle = "#0000ff";
       	ctx.stroke();
 	}
 }
