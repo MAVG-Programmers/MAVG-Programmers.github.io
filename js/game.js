@@ -727,7 +727,7 @@ function Ball()
 
 addEventListener("mousedown", doMouseDown, false);
 
-var laserColor = '#ff0000';
+var laserColor = "rgba(255, 0, 0, 1)";
 
 function Laser()
 {
