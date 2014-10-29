@@ -6,7 +6,7 @@ function Fighter()
 		this.sideLength = 20
 
 		this.hunting = false;
-		this.lasts = 30 //seconds
+		this.lasts = 5 //seconds
 		this.leaving = false;
 		this.ready = false
 		this.Target = false;
@@ -16,7 +16,7 @@ function Fighter()
 		this.speed = this.slowspeed;
 		this.reload = 0;
 		this.reloadCounter = 30;
-		this.huntingRange = 400;
+		this.huntingRange = Math.pow(600, 2);
 		this.shotsFired = false;
 		
 		this.vector_x = 0;
@@ -24,16 +24,16 @@ function Fighter()
 		this.absvector = 0;
 		this.radius = 5;
 
-		var dx = -circle.x + mouseX
-	   	var dy = circle.y - mouseY
+		var dx = -center.x + mouseX
+	   	var dy = center.y - mouseY
 	   	var distance = Math.sqrt(dy*dy+dx*dx)
 
 	   	this.rotation = -Math.atan2(dy, dx) + (Math.PI/2)
 
 		this.vector = [this.speed * Math.cos(-Math.atan2(dy, dx)), this.speed * Math.sin(-Math.atan2(dy, dx))];
 
-		this.x = circle.x + circle.radius * Math.cos(this.rotation-Math.PI/2)
-		this.y = circle.y + circle.radius * Math.sin(this.rotation-Math.PI/2)
+		this.x = center.x + center.radius * Math.cos(this.rotation-Math.PI/2)
+		this.y = center.y + center.radius * Math.sin(this.rotation-Math.PI/2)
 			
 		this.rotAks = 0.02;
 		this.degrees = 0;
@@ -99,7 +99,7 @@ function Fighter()
 			{
 				if (muted == false)
 				{
-					var haakon2 = new Audio("sound/InterFace2.mp3");
+					var haakon2 = new Audio("sound/InterFace2"+soundType);
 					haakon2.play()
 				}
 				
@@ -117,8 +117,8 @@ function Fighter()
 			this.leaving = true
 			this.flightCounter = 0
 
-			var dx = -circle.x + mouseX
-	   		var dy = circle.y - mouseY
+			var dx = -center.x + mouseX
+	   		var dy = center.y - mouseY
 			
 			this.degrees = Math.atan2(dy, dx);
 		}
@@ -142,7 +142,7 @@ function Fighter()
 		for (var cc = 0; cc < ballArray.length; cc++)
 		{
 			var ball6 = ballArray[cc]
-			if (ball6.beingTargeted == false && ball6.flightCounter < flightCounterIndex && Math.sqrt(Math.pow((ball6.x - this.x),2) + Math.pow((this.y - ball6.y),2)) < this.huntingRange)
+			if (ball6.beingTargeted == false && ball6.flightCounter < flightCounterIndex && Math.pow((ball6.x - this.x),2) + Math.pow((this.y - ball6.y),2) < this.huntingRange)
 			{
 				flightCounterIndex = ball6.flightCounter;
 				this.Target = ball6;
@@ -159,8 +159,8 @@ function Fighter()
 			this.leaving = true
 			this.flightCounter = 0
 
-			var dx = -circle.x + mouseX
-	   		var dy = circle.y - mouseY
+			var dx = -center.x + mouseX
+	   		var dy = center.y - mouseY
 			
 			this.degrees = Math.atan2(dy, dx);
 		}
@@ -179,7 +179,13 @@ function Fighter()
 		this.x += this.vector[0]
 		this.y += this.vector[1]
 
-		if(this.flightCounter == 1000)
+		if (this.flightCounter % 9 == 0)
+		{
+			var nShot = new Shot()
+			nShot.spawn(this.x, this.y, this.vector[0], this.vector[1], this.rotation, false, this)
+		}
+
+		else if(this.flightCounter == 1000)
 		{
 			fighterArray.splice(fighterArray.indexOf(this))
 		}

@@ -40,17 +40,46 @@ var circle =
 var rect = canvas.getBoundingClientRect();
 var mouseX = 0
 var mouseY = 0
+var deltaMouseX = 0
+var deltaMouseY = 0
 
-document.oncontextmenu = function(e){
+// THIS CODE DISABLES RIGHT CLICKING - SHOULD BE ACTIVATED IN THE RELEASED GAME - DEACTIVATED FOR DEBUGGING PURPOSES
+/*document.oncontextmenu = function(e){
  var evt = new Object({keyCode:93});
  stopEvent(e);
- keyboardUp(evt);
+ //keyboardUp(evt);
 }
 function stopEvent(event){
  if(event.preventDefault != undefined)
   event.preventDefault();
  if(event.stopPropagation != undefined)
   event.stopPropagation();
+}*/
+
+navigator.sayswho= (function(){
+    var ua= navigator.userAgent, tem, 
+    M= ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+    if(/trident/i.test(M[1])){
+        tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
+        return 'IE '+(tem[1] || '');
+    }
+    if(M[1]=== 'Chrome'){
+        tem= ua.match(/\bOPR\/(\d+)/)
+        if(tem!= null) return 'Opera '+tem[1];
+    }
+    M= M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+    if((tem= ua.match(/version\/(\d+)/i))!= null) M.splice(1, 1, tem[1]);
+    return M.join(' ');
+})();
+
+var soundType = ""
+if (navigator.sayswho.indexOf("Opera") == -1)
+{
+	soundType = ".mp3"
+}
+else
+{
+	soundType = ".wav"
 }
 
 function doMouseDown(event)
@@ -61,7 +90,7 @@ function doMouseDown(event)
 		var angleError = -0.1
 		if (muted == false)
 		{
-			var snd = new Audio("sound/Menu1.mp3");
+			var snd = new Audio("sound/Menu1"+soundType);
 			snd.play()
 		}
 		
@@ -105,13 +134,17 @@ function getY(event, canvas){
 
 addEventListener("mousemove", function (e) 
 {
-
+	deltaMouseX = getX(e, canvas)-mouseX
+	deltaMouseY = getY(e, canvas)-mouseY
+	deltaMouse = Math.sqrt(deltaMouseX*deltaMouseX+deltaMouseY*deltaMouseY)
 	mouseX = getX(e, canvas);
 	mouseY = getY(e, canvas);
 
 	var dx = mouseX - circle.x
 	var dy = circle.y - mouseY
 	var distance = Math.sqrt(dx * dx + dy * dy)
+	
+	deltaRotation = Math.atan2(-dy, dx)-pad.rotation
 	var angle = 0
 
 	angle = Math.atan2(-dy, dx)
@@ -144,7 +177,7 @@ var update = function (modifier)
 	}
 	if(fighterBar <= fighterBarMax)
 	{
-		fighterBar += 0.015;
+		fighterBar += 1;
 	}
 
 	updateBlast()
@@ -250,7 +283,7 @@ addEventListener("keydown", keyboard, true);
 
 var muted = false
 var fighterBar = 0;
-var fighterBarMax = 40;
+var fighterBarMax = canvas.width;
 
 function keyboard(e)
 {
@@ -280,7 +313,7 @@ function keyboard(e)
 			fighterBar = 0;
 		}
 
-		else if (muted == false)
+		if (muted == false)
 		{
 			// REFUSE BUY
 			var refuseSound = new Audio("sound/Reject1.mp3");
