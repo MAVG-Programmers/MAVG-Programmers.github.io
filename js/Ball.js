@@ -184,7 +184,7 @@ function Ball()
 	{
 		//console.trace("Black Ball Center Collision")
 		var dx = center.x-this.x
-		var dy = this.y-center.y
+		var dy = center.y-this.y
 		
 		var distanceAngle = Math.atan2(dy, dx)
 		var normalAngle = distanceAngle - Math.PI/2
@@ -263,6 +263,7 @@ function Ball()
  		
         else if (ball.flightCounter > ball.crashTime + 20/(ball.speed*100) && ball.crashing==false)
         {
+        	center.redCounter += 100
         	console.trace("Crash SHould Be", ball.flightCounter,  ball.crashTime)
         	comboHits = 0
         	comboStage = 0
