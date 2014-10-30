@@ -49,7 +49,7 @@ function stopEvent(event){
  if(event.stopPropagation != undefined)
   event.stopPropagation();
 }*/
-
+var submittedScore = false
 document.getElementById("playagainbtn").addEventListener("click", function (e) 
 {
 	location.reload();
@@ -58,7 +58,11 @@ document.getElementById("playagainbtn").addEventListener("click", function (e)
 
 document.getElementById("save").addEventListener("click", function (e) 
 {
-	submitscore(document.getElementById("namefield").value, survivedSeconds);
+	if (submittedScore == false)
+	{
+		submitscore(document.getElementById("namefield").value, survivedSeconds);
+		submittedScore = true
+	}
 }, false);
 
 navigator.sayswho= (function(){
@@ -89,7 +93,8 @@ else
 
 function doMouseDown(event)
 {
-	if (center.redCounter < 200)
+	// SHOTGUN
+	/*if (center.redCounter < 200)
 	{
 		var numLasers = 5
 		var angleError = -0.1
@@ -104,16 +109,20 @@ function doMouseDown(event)
 			var laser = new Laser();
 			laser.spawn(angleError);
 			angleError += 0.05
-		}	
-	}
-	else if (muted == false)
-	{
-		var refuseSound = new Audio("sound/Reject1"+soundType);
-		refuseSound.play()
-	}
+		}
+	}*/
+	
+	// AUTOMATIC GUN
+	center.firing = true
+	
 
 	var sx = center.x
 	var sy = center.y
+}
+
+function doMouseUp(event)
+{
+	center.firing = false
 }
 
 
@@ -189,9 +198,31 @@ var update = function (modifier)
 		if (Math.random() < spawnLimit && gameOver == false)
 		{
 			var ball = new Ball();
-			ball.spawn(ballSpeed+25*spawnLimit);
+			ball.spawn(ballSpeed+10*spawnLimit);
 			spawnLimit += 0.0005
 		}
+
+		if (center.firing)
+		{
+			if (center.gunCounter < gunLimit && center.redCounter  < 255-redLimit)
+			{
+				if (muted == false)
+				{
+					var snd = new Audio("sound/Menu1"+soundType);
+					snd.play()
+				}
+
+				var laser = new Laser();
+				laser.spawn(0);
+			}
+
+			else if (muted == false)
+			{
+				var refuseSound = new Audio("sound/Reject1"+soundType);
+				refuseSound.play()
+			}
+		}
+
 		if(fighterBar <= fighterBarMax)
 		{
 			fighterBar += 1;
@@ -199,18 +230,20 @@ var update = function (modifier)
 
 		if (center.changing == true)
 		{
-			center.radiusChanger()
+			center.radiusChanger(modifier)
 		}
 
-		updateBlast()
+		updateBlast(modifier)
 
-		updateBall();
+		updateBall(modifier);
 
-		updateLasers();
+		updateLasers(modifier);
 
-		updateShots();
+		updateShots(modifier);
 
-		updateFighters();
+		updateFighters(modifier);
+
+		//center.redCounter-=1
 	}	
 };
 
@@ -241,6 +274,7 @@ var render = function (deltaTime)
 
 		centerColor = "rgb(" +String(center.redCounter)+", 0, 0)";
 		center.redCounter = Math.max(center.redCounter-1, 0)
+		center.gunCounter = Math.max(center.gunCounter-1, 0)
 	    
 	    drawTurned();
 
@@ -321,6 +355,7 @@ var comboStage = 0
 var comboHits = 0
 
 addEventListener("mousedown", doMouseDown, false);
+addEventListener("mouseup", doMouseUp, false);
 
 addEventListener("keydown", keyboard, true);
 
