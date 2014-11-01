@@ -1,12 +1,15 @@
 var laserColor = '#ff0000';
+var accuracy = 0.01
+var recoil = 0.05
+
 
 function Laser()
 {
-	this.spawn = function(angleError)
+	this.spawn = function(angleError, n)
 	{
 		center.reloading = true
-		center.redCounter = Math.min(center.redCounter + redLimit, 255)
-		center.gunCounter = Math.min(center.gunCounter + gunLimit, 255)
+		center.redCounter = Math.min(center.redCounter + redLimit/n, 255)
+		center.gunCounter = Math.min(center.gunCounter + gunLimit/n, 255)
 		this.flightCounter = 0
 		this.speed = 15
 

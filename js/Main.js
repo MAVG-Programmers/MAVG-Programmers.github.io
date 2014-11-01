@@ -10,6 +10,58 @@ canvas.width = w.innerWidth;
 canvas.height = w.innerHeight-5;
 document.body.appendChild(canvas);
 
+// powerUps:
+
+var shotGun = true
+
+// store
+
+// LocalStorage --
+
+if (localStorage.getItem("record") == null)
+{
+	var localHighScore = []
+}
+else
+{
+	var localHighScore = localStorage.getItem("record").split(",");
+
+	console.trace("Local High Scores: ")
+	for (var i = 0; i < localHighScore.length; i++)
+	{
+		console.trace(String(i+1) + ". " + String(localHighScore[i]) + " seconds")
+	}
+}
+
+function compareNumbers(a, b) {
+  return a-b;
+}
+
+function loseGame() 
+{
+ 	survivedSeconds = String(Math.floor((Date.now()-startTime)/1000))
+	//meOverFunction(Math.floor((Date.now()-startTime)/1000));
+	gameOver = true
+	ballArray = []
+    aoeArray = []
+    turnedArray = []
+	shotArray = []
+	fighterArray = []
+	center.x = 4000
+	center.y = 4000
+	center.x = 4000
+	center.y = 4000
+	center.radius = 200
+	pad.x = 4000
+	pad.y = 4000
+
+	localHighScore.push(survivedSeconds)
+	localHighScore.sort(compareNumbers)
+	localStorage.setItem("record", localHighScore);
+	document.getElementById("overlay").style.display = "block";
+	document.getElementById("score").value = survivedSeconds       	
+}
+
 // Game objects
 
 center = new Center()
@@ -198,22 +250,44 @@ var update = function (modifier)
 		if (Math.random() < spawnLimit && gameOver == false)
 		{
 			var ball = new Ball();
-			ball.spawn(ballSpeed+10*spawnLimit);
-			spawnLimit += 0.0005
+			ball.spawn(modifier*ballSpeed+10*spawnLimit);
+			spawnLimit += modifier*0.01
 		}
 
-		if (center.firing)
+		if (center.firing && center.gunCounter < gunLimit)
 		{
-			if (center.gunCounter < gunLimit && center.redCounter  < 255-redLimit)
+			if (center.redCounter  < 255-redLimit)
 			{
-				if (muted == false)
+				if (shotGun == false)
 				{
-					var snd = new Audio("sound/Menu1"+soundType);
-					snd.play()
+					if (muted == false)
+					{
+						var snd = new Audio("sound/Menu1"+soundType);
+						snd.play()
+					}
+
+					var laser = new Laser();
+					laser.spawn((Math.random()-0.5)*accuracy + (Math.random()-0.5)*center.gunCounter*recoil, 1);
 				}
 
-				var laser = new Laser();
-				laser.spawn(0);
+				else
+				{
+					//var accoil = (Math.random()-0.5)*accuracy + (Math.random()-0.5)*center.gunCounter*recoil
+					var numLasers = 5
+					var angleError = -0.1
+					if (muted == false)
+					{
+						var snd = new Audio("sound/Menu1.wav");
+						snd.play()
+					}
+					
+					for (l = 0; l < numLasers; l++)
+					{
+						var laser = new Laser();
+						laser.spawn(0, 5);
+						angleError += 0.05
+					}	
+				}
 			}
 
 			else if (muted == false)
@@ -268,7 +342,7 @@ var render = function (deltaTime)
 
 	else if(gameOver == false)
 	{
-		bar.drawLine(fighterBar);
+		bar.drawLine(fighterBar, deltaTime);
 
 		drawBlast();
 
@@ -413,25 +487,7 @@ function keyboard(e)
 		}
 		else //INSTADEATH
 		{
-			survivedSeconds = String(Math.floor((Date.now()-startTime)/1000))
-				//meOverFunction(Math.floor((Date.now()-startTime)/1000));
-				gameOver = true
-	       		ballArray = []
-        		aoeArray = []
-	       		turnedArray = []
-	       		shotArray = []
-	       		fighterArray = []
-	       		center.x = 4000
-	       		center.y = 4000
-	       		center.x = 4000
-	       		center.y = 4000
-	       		center.radius = 200
-	       		pad.x = 4000
-	       		pad.y = 4000
-
-	       		document.getElementById("overlay").style.display = "block";
-	       		document.getElementById("score").value = survivedSeconds
-	       	
+			loseGame()
 		}
 	}
 }
@@ -459,8 +515,8 @@ function drawTurned()
     	turned.moveIntoOrbit()
         turned.circleCounter += turned.circleSpeed
 
-		turned.vector[0] = -Math.sin(turned.circleCounter + turned.crashAngle) + turned.errorSpeedX * 0.01
-		turned.vector[1] = Math.cos(turned.circleCounter + turned.crashAngle) + turned.errorSpeedY * 0.01
+		turned.vector[0] = -Math.sin(turned.circleCounter + turned.crashAngle) + turned.errorSpeedX * turned.circleSpeed
+		turned.vector[1] = Math.cos(turned.circleCounter + turned.crashAngle) + turned.errorSpeedY * turned.circleSpeed
 		turned.x += turned.vector[0]
 		turned.y += turned.vector[1]
 
@@ -514,11 +570,11 @@ function drawBlast()
 	});
 }
 
-function updateBall()
+function updateBall(modifier)
 {
 	ballArray.forEach(function(ball)
     {  
-        ball.updateBall(ball);
+        ball.updateBall(ball, modifier);
 	});
 }
 
@@ -560,11 +616,11 @@ function drawWaste()
 	});
 }
 
-function updateLasers()
+function updateLasers(modifier)
 {
 	laserArray.forEach(function(laser)
 	{	
-		laser.updateLaser(laser);
+		laser.updateLaser(modifier);
 	});
 }
 
@@ -576,11 +632,12 @@ function drawLasers()
 	});
 }
 
-function updateShots()
+function updateShots(modifier)
 {
 	shotArray.forEach(function(shot)
 	{
-		shot.updateShot(shot);
+
+		shot.updateShot(modifier);
 	});
 }
 
@@ -592,11 +649,11 @@ function drawShots()
 	});
 }
 
-function updateFighters()
+function updateFighters(modifier)
 {
 	fighterArray.forEach(function(fighter)
 	{
-		fighter.updateFighter(fighter);
+		fighter.updateFighter(fighter, modifier);
 	});
 }
 

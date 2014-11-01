@@ -4,13 +4,14 @@ function jetBar(){
 
 	this.color = 'green';
 
-	this.drawLine = function(length){
+	this.drawLine = function(length, modifier){
 		ctx.fillStyle = this.color;
 
 		ctx.beginPath();
 
 		ctx.moveTo(this.x, this.y);
 		ctx.lineTo(this.x + length, this.y);
+		
 		ctx.lineWidth = 15;
 
 		ctx.stroke();

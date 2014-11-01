@@ -3,7 +3,7 @@ function Shot()
 	this.spawn = function(xStart, yStart, xDif, yDif, rot, Target, pPlane)
 	{
 		this.Error = 0.2
-		this.speed = 15
+		this.speed = 1500
 		this.x = xStart
 		this.y = yStart
 		this.xStart = xStart 
@@ -19,8 +19,8 @@ function Shot()
 
 	this.updateShot = function(modifier)
 	{
-		this.x += this.speed * this.xDif;
-		this.y += this.speed * this.yDif;
+		this.x += this.speed * this.xDif * modifier;
+		this.y += this.speed * this.yDif * modifier;
 		if (this.Target != false)
 		{
 			if (Math.sqrt((this.Target.x-this.x)*(this.Target.x-this.x)+(this.y-this.Target.y)*(this.y-this.Target.y)) < this.parentPlane.sideLength + this.Target.radius)

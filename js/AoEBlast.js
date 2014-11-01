@@ -37,6 +37,7 @@ function AoEBlast()
 				{
 					ballArray.splice(b, 1)
 					wasteArray[wasteArray.length] = ball5
+					ball5.color = "black"
 				}
 			}
 			for (var t = 0; t < wasteArray.length; t++)
@@ -60,8 +61,7 @@ function AoEBlast()
 				var distance = Math.sqrt(dx * dx + dy * dy)
 				if (distance <= this.radius)
 				{
-					turned.orbitRadius += 20
-					turned.circleSpeed += 0.01
+					turned.orbitRadius = Math.min(turned.orbitRadius+10, 0.5*canvas.height)
 				}
 			}
 		}
