@@ -100,7 +100,7 @@ function stopEvent(event){
   event.preventDefault();
  if(event.stopPropagation != undefined)
   event.stopPropagation();
-
+}
 var submittedScore = false
 document.getElementById("playagainbtn").addEventListener("click", function (e) 
 {
